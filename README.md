@@ -1,4 +1,4 @@
-This GitHub organization houses code and other materials related to the active development pertaining to research conducted through the Bio Inspired Sciences and Engineering lab (BIST) at Virginia Tech. 
+This GitHub organization houses code and other materials related to research conducted through the Bio Inspired Sciences and Engineering lab (BIST) at Virginia Tech. 
 
 # Working with embedded code
 
