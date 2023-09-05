@@ -1,6 +1,6 @@
 This GitHub organization houses code and other materials related to the active development pertaining to research conducted through the Bio Inspired Sciences and Engineering lab (BIST) at Virginia Tech. 
 
-#Embedded code
+# Working with embedded code
 
 ## VSCode, PlatformIO and uploading code
 
