@@ -1,5 +1,7 @@
 This GitHub organization houses code and other materials related to research conducted through the Bio Inspired Sciences and Engineering lab (BIST) at Virginia Tech. 
 
+# Base sonar system setup instructions
+
 ## Software
 
 ### Step 1: Boot and install Jetson operating system
