@@ -8,7 +8,7 @@ This GitHub organization houses code and other materials related to research con
 
 Download the [SD card image](https://developer.nvidia.com/embedded/l4t/r32_release_v7.1/jp_4.6.1_b110_sd_card/jeston_nano/jetson-nano-jp461-sd-card-image.zip) for the Nvidia Jetson
 
-And flash it to an SD card which is sufficient in size (< 128 GB). I use [Balena Etcher](https://etcher.balena.io) to do this.
+And flash it to an SD card which is sufficient in size (> 128 GB). I use [Balena Etcher](https://etcher.balena.io) to do this.
 
 After flashing, put the SD card into the Jetson and supply the Jetson power either through the micro USB port, or the DC barrel jack. If you use the USB power, you have to make sure the little jumper over by the barrel jack is connected. Otherwise, disconnect it. 
 
