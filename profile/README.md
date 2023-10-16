@@ -1,8 +1,56 @@
 This GitHub organization houses code and other materials related to research conducted through the Bio Inspired Sciences and Engineering lab (BIST) at Virginia Tech. 
 
-# Working with embedded code
+## Software
 
-## VSCode, PlatformIO and uploading code
+### Step 1: Boot and install Jetson operating system
+
+Download the [SD card image](https://developer.nvidia.com/embedded/l4t/r32_release_v7.1/jp_4.6.1_b110_sd_card/jeston_nano/jetson-nano-jp461-sd-card-image.zip) for the Nvidia Jetson
+
+And flash it to an SD card which is sufficient in size (< 128 GB). I use [Balena Etcher](https://etcher.balena.io) to do this.
+
+After flashing, put the SD card into the Jetson and supply the Jetson power either through the micro USB port, or the DC barrel jack. If you use the USB power, you have to make sure the little jumper over by the barrel jack is connected. Otherwise, disconnect it. 
+
+The power supply needs to supply at least 5V @ 2500 mA
+
+Once you plug it in, I would recommend connecting a display and keyboard and mouse to do the initial setup. It should boot you into an install screen, so go through that, and skip the network setup for now.
+
+Proceed through the install and wait for the reboot, at which point, log in to the Jetson. 
+
+### Step 2: Network setup
+
+In order to connect to eduroam, you will need to first manually adjust the time and date settings to be approximately the right time and date.
+
+After this is done, follow the instructions [here](https://vtluug.org/wiki/Virginia_Tech_Wifi) to connect the Jetson to eduroam (scroll down to "NetworkManager Instructions" for the GUI based setup).
+
+
+
+Once you have an internet connection, you can go back to the time and date settings and make it automatic again. 
+
+### Step 3: Update system and install required packages
+
+```sudo apt update && sudo apt upgrade -y```
+
+REBOOT (it may give you an error about not being able to setup l4t-headers, ignore this)
+
+```sudo apt install python3.8 python3.8-dev python3-pip curl```
+```sudo ln -s /usr/bin/python3.8 /usr/bin/py3```
+
+```py3 -m pip install --upgrade pip```
+```py3 -m pip install --upgrade scipy```
+```py3 -m pip install --upgrade matplotlib```
+```py3 -m pip install --upgrade pyserial```
+
+Now, download the code (I would recommend being in the home directory when running this command):
+
+```git clone https://github.com/BIST-Research/batbot6 --branch oregon-rig```
+
+Go into the ```batbot6``` directory and run
+
+```py3 bb_run_pyplot.py```
+
+If you get a message saying something about not finding the serial number, then the Jetson is ready to go. 
+
+## Step 4: Embedded code
 
 First, install [VSCode](https://code.visualstudio.com/Download) and the [PlatformIO](https://platformio.org/install/ide?install=vscode) extension. 
 
@@ -21,3 +69,54 @@ Now, go back to VSCode, and the ```src``` directory should be holding the projec
 Next, connect the microcontroller and verify that PIO sees it by pressing the PIO home button (bottom tool bar) and going to the "devices" section in the left hand toolbar. If it doesn't show, see the "Updating the MCU bootloader" section of this readme.
 
 Press the arrow icon in the bottom toolbar to upload the code. If the upload process hangs on ```waiting for new upload port``` and then fails, double tap the reset button on the MCU and try reuploading. 
+
+## Step 5: Verify software is working
+
+Get the serial number of the microcontroller by plugging it into your computer and finding it in device manager 
+
+Note: if you are using a non-data microusb, i.e., it only supplies power, then the device will not show up, so if thats the case, try different micro USB cable. 
+
+Go into the batbot6 directory on the Jetson and do
+
+```gedit bb_conf.yaml```
+
+At the top of this file, there should be a field called "serial numbers" and a list of numbers within it. If the serial number of the board you are using is not in there, then add it and save the changes. 
+
+Plug in the microcontroller to one of the USB ports on the Jetson and run the same command as before:
+
+```py3 bb_run_pyplot.py```
+
+This time, it should say something like ```Found device on ...``` And a few seconds later a matplot window should show up. If it still shows the same red message about not finding a device, then try a new cable and/or re-upload the embedded code to the microcontroller. 
+
+If it finds the device, but then just hangs, with no marplot window showing, see ```step 6``` below.
+
+Once the window shows up, ```crtl-c``` the process to stop it.
+
+Note:
+
+```py3 bb_run_pyplot.py```
+
+Will run indefinitely, but if I were to append ```10``` to the end of the command:
+
+```py3 bb_run_pyplot.py 10```
+
+The code will execute 10 runs (I am defining a "run" as one chirp and listen). The data for the runs is dumped into ```data_dst/```. The code will automatically generate this folder if it does not exist.
+
+## Step 6: Adjusting the record time
+
+If after executing the pyplot script, it just hangs there after finding the device, it is because the Jetson is expecting to receive more data from the microcontroller than the microcontroller is told to send. To fix this, go back to VSCode, and open ```ml_main.cpp``` and ctrl-f and type ```num_adc_samples```. Find the variable definition (it is a constant) and note down the number (by default I believe its 30000). 
+
+Now, go to the Jetson and open ```bb_conf.yaml```. There should be field called ```num_samples```. Make sure that the number there matches the number in the embedded code. 
+
+If you want to change the record time, you will have to reupload the embedded code after changing ```num_adc_samples```. If you change this value in the embedded code, make sure to change the value in ```bb_conf.yaml``` to be the same value. 
+
+Note that although ```type(num_adc_samples) = uint16_t```, this number has to be < around 45000 samples because of RAM limitations (platformio will tell you during the upload phase if you exceed the amount of RAM available on the MCU). 
+
+Note that the ADC sampling period is ```T = 1 us``` or equivalently, the sampling rate is ```R = 1 MSPS```
+
+## Step 7: Adjusting sweep frequency range
+
+The range of frequencies of the chirp can be varied directly within ```bb_conf.yaml``` without having to upload new embedded code. Note that because of frequency limitations in the hardware, we will have trouble seeing anything back > 120 kHz. 
+
+
+
