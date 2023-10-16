@@ -8,7 +8,7 @@ This GitHub organization houses code and other materials related to research con
 
 Download the [SD card image](https://developer.nvidia.com/embedded/l4t/r32_release_v7.1/jp_4.6.1_b110_sd_card/jeston_nano/jetson-nano-jp461-sd-card-image.zip) for the Nvidia Jetson
 
-And flash it to an SD card which is sufficient in size (> 128 GB). I use [Balena Etcher](https://etcher.balena.io) to do this.
+And flash it to an SD card which is sufficient in size (< 128 GB). I use [Balena Etcher](https://etcher.balena.io) to do this.
 
 After flashing, put the SD card into the Jetson and supply the Jetson power either through the micro USB port, or the DC barrel jack. If you use the USB power, you have to make sure the little jumper over by the barrel jack is connected. Otherwise, disconnect it. 
 
@@ -52,7 +52,7 @@ Go into the ```batbot6``` directory and run
 
 If you get a message saying something about not finding the serial number, then the Jetson is ready to go. 
 
-## Step 4: Embedded code
+### Step 4: Embedded code
 
 First, install [VSCode](https://code.visualstudio.com/Download) and the [PlatformIO](https://platformio.org/install/ide?install=vscode) extension. 
 
@@ -72,7 +72,7 @@ Next, connect the microcontroller and verify that PIO sees it by pressing the PI
 
 Press the arrow icon in the bottom toolbar to upload the code. If the upload process hangs on ```waiting for new upload port``` and then fails, double tap the reset button on the MCU and try reuploading. 
 
-## Step 5: Verify software is working
+### Step 5: Verify software is working
 
 Get the serial number of the microcontroller by plugging it into your computer and finding it in device manager 
 
@@ -104,9 +104,9 @@ Will run indefinitely, but if I were to append ```10``` to the end of the comman
 
 The code will execute 10 runs (I am defining a "run" as one chirp and listen). The data for the runs is dumped into ```data_dst/```. The code will automatically generate this folder if it does not exist.
 
-## Step 6: Adjusting the record time
+### Step 6: Adjusting the record time
 
-If after executing the pyplot script, it just hangs there after finding the device, it is because the Jetson is expecting to receive more data from the microcontroller than the microcontroller is told to send. To fix this, go back to VSCode, and open ```ml_main.cpp``` and ctrl-f and type ```num_adc_samples```. Find the variable definition (it is a constant) and note down the number (by default I believe its 30000). 
+If after executing the pyplot script, it just hangs there after finding the device, it is because the Jetson is expecting to receive more data from the microcontroller than the microcontroller is told to send. To fix this, go back to VSCode, and open ```ml_main.cpp``` and ```ctrl-f``` and type ```num_adc_samples```. Find the variable definition (it is a constant) and note down the number (by default I believe its 30000). 
 
 Now, go to the Jetson and open ```bb_conf.yaml```. There should be field called ```num_samples```. Make sure that the number there matches the number in the embedded code. 
 
@@ -116,9 +116,20 @@ Note that although ```type(num_adc_samples) = uint16_t```, this number has to be
 
 Note that the ADC sampling period is ```T = 1 us``` or equivalently, the sampling rate is ```R = 1 MSPS```
 
-## Step 7: Adjusting sweep frequency range
+### Step 7: Adjusting sweep frequency range
 
 The range of frequencies of the chirp can be varied directly within ```bb_conf.yaml``` without having to upload new embedded code. Note that because of frequency limitations in the hardware, we will have trouble seeing anything back > 120 kHz. 
+
+# Production runs
+The script used in the setup, ```bb_pyplot.py``` is good for verifying that everything is working. Once the hardware is setup, it can be used to preform constant frequency tests and for verifying that echos are being sent and received.
+
+Once you have tested that the system is working correctly, ```bb_run_production.py``` can be run to actually preform the data collection. You will notice that this script is significantly faster than the pyplot. This is because the plotting of the signals takes the most time in the loop, and thus when we want to acquire data, we don't plot the real time results. Just like for ```bb_run_pyplot```, the run data will be saved to ```data_dst/```. 
+
+
+
+
+
+
 
 
 
