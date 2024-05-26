@@ -18,7 +18,7 @@ Future work:
 - Add preprocessing which can allow code to be run on any of the microcontroller boards we use (e.g., the sonar systems are written for the itsy bitsy m4 only). Although all the MCU boards we use (aside from Teensy 4.1) use the same microprocessor, the pinouts are different. 
 - Move away from the arduino framework, and instead use Microchip's development suites. This should happen when the project moves towards more integrated hardware, e.g., the microcontroller is integrated onto our custom PCBs.
 
-[FieldBot](https://github.com/BIST-Research/fieldbot)
+## [FieldBot](https://github.com/BIST-Research/fieldbot)
 This repository houses the code which runs the sonar and gps systems on the field data collection rigs in the lab. As of May 2024, the main rover is now in Brunei, and this repository is maintained by the researchers who are there. 
 
 
